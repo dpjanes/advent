@@ -9,6 +9,10 @@ iiii oiii ooii oooi oooo is valid.
 oiii ioii iioi iiio is not valid - any of these words can be rearranged to form any other word.
 */
 
+/*
+ *  Core insight is that you can test if words 
+ *  are anagrams by sorting them
+ */
 const is_valid = passphrase => passphrase
     .split(" ")
     .map(word => word
