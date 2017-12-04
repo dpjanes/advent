@@ -14,11 +14,15 @@
 /**
  *  If you follow this through a step at a time
  *  and think about it, you'll get it. I
- *  didn't look this up lol
+ *  didn't look this up lol.
+ *
+ *  Core insight is that the number of steps = 
+ *  Steps to the edge, plus steps from center 
+ *  of edge, both of which can be simply computed
  *
  *  But for say 12,
  *
- *      ring = 2
+ *      ring = 1
  *      side = 4 (not 5!)
  *      end = 25
  *      edge = 3 (edges are 0-3)
@@ -32,13 +36,13 @@ const distance = position => {
         return 0;
     }
 
-    const ring = Math.ceil(Math.ceil(Math.sqrt(position)) / 2 + 0.5)
-    const side = (ring - 1) * 2
+    const ring = Math.ceil(Math.ceil(Math.sqrt(position)) / 2 - 0.5)
+    const side = ring * 2;
     const end = (side + 1) ** 2
     const edge = Math.floor((end - position) / side)
     const edge_center = end - (side / 2) - (edge * side)
 
-    return Math.abs(edge_center - position) + ring - 1;
+    return Math.abs(edge_center - position) + ring;
 }
 
 console.log(distance(1))
