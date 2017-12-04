@@ -11,6 +11,11 @@ oiii ioii iioi iiio is not valid - any of these words can be rearranged to form 
 
 const is_valid = passphrase => passphrase
     .split(" ")
+    .map(word => word
+        .split("")
+        .sort()
+        .join("")
+    )
     .sort()
     .filter((value, index, array) => value === array[(index + 1) % array.length])
     .find(repeat => repeat) ? false : true;
@@ -21,9 +26,10 @@ const valid_count = input => input
     .filter(line => is_valid(line))
     .reduce((total, value) => total + 1, 0);
 
-console.log(valid_count("aa bb cc dd ee"))
-console.log(valid_count("aa bb cc dd aa"))
-console.log(valid_count("aa bb cc dd aaa"))
+console.log(valid_count("abcde fghij"))
+console.log(valid_count("abcde xyz ecdab"))
+console.log(valid_count("a ab abc abd abf abj"))
+console.log(valid_count("iiii oiii ooii oooi oooo"))
 
 console.log(valid_count(`
 oaoe rxeq vssdqtu xrk cjv yaoqp loo
