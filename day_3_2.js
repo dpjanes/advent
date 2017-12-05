@@ -28,7 +28,6 @@ const find = target => {
 
     set(0, 0, 1);
 
-    let value = 0;
     for (let ring = 1; ; ring++) {
         let side = ring * 2;
         let end = (side + 1) ** 2
@@ -48,7 +47,7 @@ const find = target => {
             case 0: y = -ring; x = position - edge_center; break;
             }
 
-            value = set(x, y, sum(x, y))
+            let value = set(x, y, sum(x, y))
             if (value > target) {
                 return value;
             }
