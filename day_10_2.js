@@ -29,6 +29,7 @@ const hash = (string) => {
             write(read(length))
 
             position += length + skip++;
+            position %= 256; // pedantic, needed for Gb sized inputs
         }
     }
 

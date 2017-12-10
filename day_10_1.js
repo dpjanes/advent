@@ -21,6 +21,7 @@ const hash = (period, lengths) => {
         write(read(length))
 
         position += length + skip++;
+        position %= 256; // pedantic, needed for Gb sized inputs
     }
 
     return table[0] * table[1];
