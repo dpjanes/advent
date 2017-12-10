@@ -12,15 +12,13 @@ const hash = (period, lengths) => {
     const get = position => table[position % period];
     const put = (position, value) => table[position % period] = value;
 
-    const read = length => Array(length).fill().map((v, i) => get(position + i))
+    const read = length => Array(length).fill().map((v, i) => get(position + (length - i - 1)))
     const write = subarray => subarray.forEach((v, i) => put(position + i, v))
 
     while (lengths.length) {
         const length = lengths.shift();
 
-        const subarray = read(length)
-        subarray.reverse()
-        write(subarray)
+        write(read(length))
 
         position += length + skip++;
     }
