@@ -10,7 +10,7 @@ const parse = rules => rules
         tos: match[2].split(", ").map(v => parseInt(v)),
     }))
 
-const count = raw => {
+const groups = raw => {
     const rules = parse(raw)
 
     const fill = start => {
@@ -36,10 +36,23 @@ const count = raw => {
         return seen;
     }
 
-    return fill(0).length;
+    let superseen = [];
+    let count = 0;
+
+    rules.forEach(rule => {
+        if (superseen.indexOf(rule.from) > -1) {
+            return;
+        }
+
+        count++;
+
+        superseen = superseen.concat(fill(rule.from))
+    })
+    
+    return count;
 }
 
-console.log(count(`
+console.log(groups(`
 0 <-> 2
 1 <-> 1
 2 <-> 0, 3, 4
@@ -47,7 +60,7 @@ console.log(count(`
 4 <-> 2, 3, 6
 5 <-> 6
 6 <-> 4, 5`))
-console.log(count(`
+console.log(groups(`
 0 <-> 480, 1750
 1 <-> 52, 393, 635, 800, 840
 2 <-> 575, 1950
