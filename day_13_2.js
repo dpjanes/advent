@@ -15,6 +15,12 @@ const parse = raw => raw
         return cfg;
     }, []);
 
+/**
+ *  Note I realized after that you only need to know
+ *  when a position is at 0, which is really checking
+ *  for a cycle of 2*Position. So this could be 
+ *  much quicker.
+ */
 const advance = cfg => {
     cfg.forEach(item => {
         item.position += item.direction;
