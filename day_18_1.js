@@ -1,4 +1,4 @@
-// http://adventofcode.com/2017/day/13
+// http://adventofcode.com/2017/day/18
 "use strict";
 
 const assert = require("assert")
