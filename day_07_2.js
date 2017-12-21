@@ -68,7 +68,7 @@ const topmost = data => {
                 sums[child.sum] = (sums[child.sum] || []).concat([ child ])
             })
 
-            console.log("HERE:XXX", Object.keys(sums))
+            console.log("HERE:XXX", Object.keys(sums), program.children.length)
 
             const keys = Object.keys(sums);
             if (keys.length !== 2) {
