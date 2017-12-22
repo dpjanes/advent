@@ -1,24 +1,6 @@
 // http://adventofcode.com/2017/day/7
 "use strict";
 
-/*
-
-pbga (66)
-xhth (57)
-ebii (61)
-havc (66)
-ktlj (57)
-fwft (72) -> ktlj, cntj, xhth
-qoyq (66)
-padx (45) -> pbga, havc, qoyq
-tknk (41) -> ugml, padx, fwft
-jptl (61)
-ugml (68) -> gyxo, ebii, jptl
-gyxo (61)
-cntj (57)
-
-*/
-
 const sum = (...rest) => rest.reduce((total, current) => total + current, 0)
 
 const parse = data => data
@@ -39,6 +21,7 @@ const topmost = data => {
         return tower
     }, {})
 
+    // this makes the hierarchy
     parsed.forEach(program => {
         program.sum = program.weight;
 
@@ -51,14 +34,20 @@ const topmost = data => {
             })
     })
 
+    // this calculates weights
     parsed.forEach(program => {
         program.children.forEach(child => {
-            while (child.parent) {
-                child.parent.sum += child.weight;
-                child = child.parent;
+            let parent = child.parent;
+            while (parent) {
+                parent.sum += child.weight;
+                parent = parent.parent;
             }
         })
     })
+    
+    // this finds all the corrections - we know there's 1, 
+    // but that can have a ripple effect so we look for the smallest
+    let correction = null;
 
     parsed
         .filter(program => program.children.length)
@@ -68,14 +57,13 @@ const topmost = data => {
                 sums[child.sum] = (sums[child.sum] || []).concat([ child ])
             })
 
-            console.log("HERE:XXX", Object.keys(sums), program.children.length)
-
             const keys = Object.keys(sums);
             if (keys.length !== 2) {
                 return;
             }
 
-            console.log("HERE:XXX.1")
+            // console.log("HERE:XXX", Object.keys(sums), program.children.length)
+            // console.log("HERE:XXX.1")
 
             let wrong;
             let right;
@@ -90,11 +78,14 @@ const topmost = data => {
 
             wrong.correction = wrong.weight + (right.sum - wrong.sum);
 
-            console.log("HERE:XXX.3", wrong.correction)
-            process.exit()
+            if (correction === null) {
+                correction = wrong.correction;
+            } else {
+                correction = Math.min(correction, wrong.correction);
+            }
         })
 
-    // return parsed.find(program => program.correction).correction;
+    return correction;
 }
 
 /*
@@ -113,6 +104,8 @@ ugml (68) -> gyxo, ebii, jptl
 gyxo (61)
 cntj (57)
 `))
+
+process.exit()
 */
 
 console.log(topmost(`
