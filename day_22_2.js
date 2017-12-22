@@ -3,6 +3,11 @@
 
 const assert = require("assert");
 
+const CLEAN = "."
+const WEAKENED = "W"
+const FLAGGED = "F"
+const INFECTED = "#"
+
 const Grid = () => {
     const self = Object.assign({})
 
@@ -18,10 +23,10 @@ const Grid = () => {
     
     self.data = {}
     self.set = (x, y, c) => {
-        if (c === '#') {
-            self.data[`${x}/${y}`] = c;
-        } else {
+        if (c === '.') {
             delete self.data[`${x}/${y}`];
+        } else {
+            self.data[`${x}/${y}`] = c;
         }
     }
     self.get = (x, y) => self.data[`${x}/${y}`] || ".";
@@ -46,6 +51,11 @@ const Grid = () => {
     }
 
     self.infected = () => infected;
+
+    self.reverse = () => {
+        dx = -dx;
+        dy = -dy;
+    }
 
     self.right = () => {
         if (dx === 1) {
@@ -86,13 +96,20 @@ const Grid = () => {
     self.move = () => {
         assert.ok(dx + dy);
 
-        if (self.get(cx, cy) === '#') {
+        if (self.get(cx, cy) === INFECTED) {
             self.right()
-            self.set(cx, cy, '.')
-        } else {
-            self.left()
-            self.set(cx, cy, '#')
+            self.set(cx, cy, FLAGGED)
+        } else if (self.get(cx, cy) === FLAGGED) {
+            self.reverse()
+            self.set(cx, cy, CLEAN)
+        } else if (self.get(cx, cy) === WEAKENED) {
+            self.set(cx, cy, INFECTED)
             infected ++;
+        } else if (self.get(cx, cy) === CLEAN) {
+            self.left()
+            self.set(cx, cy, WEAKENED)
+        } else {
+            assert.ok(0)
         }
 
         cx += dx;
@@ -114,7 +131,11 @@ const Grid = () => {
             cs.push("   ")
 
             for (let x = minx; x <= maxx; x++) {
-                cs.push(self.get(x, y))
+                if ((x === cx) && (y === cy)) {
+                    cs.push("[" + self.get(x, y) + "]")
+                } else {
+                    cs.push(" " + self.get(x, y) + " ")
+                }
             }
         }
 
@@ -131,9 +152,12 @@ const Grid = () => {
 const run = (raw, iterations) => {
     let grid = Grid()
     grid.initialize(raw)
-    console.log(grid.pretty())
+    // console.log(grid.pretty())
 
     for (let i = 0; i < iterations; i++) {
+        if ((i % 10000) === 0) {
+            console.log("*", i)
+        }
         /*
         console.log("*", i)
         console.log(grid.pretty());
@@ -146,11 +170,18 @@ const run = (raw, iterations) => {
 
 }
 
+/*
 console.log(run(`
 ..#
 #..
 ...
-`, 10000))
+`, 100))
+console.log(run(`
+..#
+#..
+...
+`, 10000000))
+*/
 console.log(run(`
 #..#...#.#.#..#.#...##.##
 .....##.#....#.#......#.#
@@ -177,4 +208,4 @@ console.log(run(`
 ...##.##...#..#..##.####.
 #.....##.##.#..##.##....#
 #.#..####.....#....#.###.
-`, 10000))
+`, 10000000))
