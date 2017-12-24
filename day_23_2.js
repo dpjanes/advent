@@ -21,7 +21,8 @@ const _register = x => x.match(/^[a-h]/)
 const decompile = raw => {
 
     console.log(`
-void main()
+#include <stdio.h>
+int main()
 {
     int a = 1;
     int b = 0;
@@ -33,7 +34,8 @@ void main()
     int h = 0;
 `)
 
-    parse(raw).forEach((step, line) => {
+    const steps = parse(raw)
+    steps.forEach((step, line) => {
         // console.log()
         console.log(`// ${step.op} ${step.x} ${step.y}`)
         // console.log(`step${line}:`)
@@ -57,36 +59,8 @@ void main()
         }
     })
 
-    /*
-        case "set": 
-            // sets register X to the value of Y.
-            set(instruction.x, get(instruction.y))
-            break;
-            
-        case "mul": 
-            // sets register X to the result of multiplying the 
-            // value contained in register X by the value of Y.
-            set(instruction.x, get(instruction.x) * get(instruction.y))
-            count++;
-            break;
-
-        case "sub": 
-            // decreases register X by the value of Y.
-            set(instruction.x, get(instruction.x) - get(instruction.y))
-            break;
-
-        case "jnz":     
-            // Y jumps with an offset of the value of Y, 
-            // but only if the value of X is not zero. 
-            // (An offset of 2 skips the next instruction, 
-            // an offset of -1 jumps to the previous instruction, 
-            // and so on.)
-            if (get(instruction.x) !== 0) {
-                pc += get(instruction.y) - 1;
-                console.log("--");
-            }
-    */
-
+    console.log(`step${steps.length}: printf("%d", h);`)
+    console.log("   return 0;");
     console.log("}")
 }
 
