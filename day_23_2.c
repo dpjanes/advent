@@ -2,7 +2,7 @@
 #include <stdio.h>
 int main()
 {
-    int a = 0;
+    int a = 1;
     int b = 0;
     int c = 0;
     int d = 0;
@@ -22,6 +22,9 @@ step4:
     b += 100000; 
     c = b;
     c += 17000; 
+
+        printf("%d/%d\n", b, c);
+        exit(0);
 step8:
     f = 1;
     d = 2;
