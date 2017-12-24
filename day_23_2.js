@@ -32,34 +32,55 @@ int main()
     int f = 0;
     int g = 0;
     int h = 0;
+    int mul = 0;
 `)
 
+    const labels = {}
     const steps = parse(raw)
     steps.forEach((step, line) => {
+        if (step.op === "jnz") {
+            labels[line + parseInt(step.y)] = true;
+        }
+    })
+    // console.log(labels)
+    // process.exit()
+    steps.forEach((step, line) => {
         // console.log()
-        console.log(`// ${step.op} ${step.x} ${step.y}`)
+        // console.log(`// ${step.op} ${step.x} ${step.y}`)
         // console.log(`step${line}:`)
 
+        if (labels[line]) {
+            console.log(`step${line}:`);
+        }
         switch (step.op) {
         case "set":
-            console.log(`step${line}: ${step.x} = ${step.y};`)
+            console.log(`    ${step.x} = ${step.y};`)
             break;
 
         case "mul":
-            console.log(`step${line}: ${step.x} *= ${step.y};`)
+            console.log(`    ${step.x} *= ${step.y};`)
+            console.log(`    mul++;`);
             break;
 
         case "sub":
-            console.log(`step${line}: ${step.x} -= ${step.y}; `)
+            if (_register(step.y)) {
+                console.log(`    ${step.x} -= ${step.y}; `)
+            } else if (step.y === "-1") {
+                console.log(`    ${step.x} ++;`);
+            } else {
+                console.log(`    ${step.x} += ${-parseInt(step.y)}; `)
+            }
             break;
                 
         case "jnz":     
-            console.log(`step${line}: if (${step.x}) goto step${line + parseInt(step.y)};`)
+            console.log(`    if (${step.x}) goto step${line + parseInt(step.y)};`)
             break
         }
     })
 
-    console.log(`step${steps.length}: printf("%d", h);`)
+    console.log(`step${steps.length}:`);
+    console.log(`   printf("mul: %d\\n", mul);`)
+    console.log(`   printf("h: %d\\n", h);`)
     console.log("   return 0;");
     console.log("}")
 }
