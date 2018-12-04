@@ -15,16 +15,15 @@ func check(e error) {
 
 func main() {
     dat, err := ioutil.ReadFile("data.dat")
+    check(err)
 
     s_changes := strings.Split(string(dat), "\n")
 
     frequency := 0
-    i_changes := make([]int, 0)
-    for _, v := range s_changes {
-        i, err := strconv.Atoi(v)
+    for _, s_change := range s_changes {
+        i_change, err := strconv.Atoi(s_change)
         if err == nil {
-            i_changes = append(i_changes, i)
-            frequency += i
+            frequency += i_change
         }
     }
 
