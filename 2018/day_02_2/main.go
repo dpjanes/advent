@@ -5,7 +5,6 @@ package main
 import "fmt"
 import "io/ioutil"
 import "strings"
-import "strconv"
 
 func check(e error) {
     if e != nil {
@@ -14,20 +13,49 @@ func check(e error) {
 }
 
 func main() {
-    /*
     dat, err := ioutil.ReadFile("data.dat")
     check(err)
 
-    s_changes := strings.Split(string(dat), "\n")
+    s_codess := [][]string {}
 
-    frequency := 0
-    for _, s_change := range s_changes {
-        i_change, err := strconv.Atoi(s_change)
-        if err == nil {
-            frequency += i_change
+    s_codes := strings.Split(string(dat), "\n")
+    for _, s_code := range s_codes {
+        if len(s_code) > 0 {
+            s_codess = append(s_codess, strings.Split(s_code, ""))
         }
     }
 
-    fmt.Printf("%v\n", frequency)
-    */
+    found := false
+    outerx := 0
+    for outerx < len(s_codess) && !found {
+        s_outer := s_codess[outerx]
+        outerx ++
+
+        innerx := outerx + 1
+        for innerx < len(s_codess) {
+            s_inner := s_codess[innerx]
+            innerx ++
+
+            count := 0
+            for sx, sc := range s_outer {
+                if (sc != s_inner[sx]) {
+                   count += 1
+                }
+            }
+
+            if count == 1 {
+                for sx, sc := range s_outer {
+                    if (sc == s_inner[sx]) {
+                        fmt.Print(sc)
+                    }
+                }
+                fmt.Print("\n")
+
+                found = true
+                break
+            }
+
+        }
+
+    }
 }
