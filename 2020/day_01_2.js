@@ -1,6 +1,6 @@
 // http://adventofcode.com/2020/day/1
 const fs = require("fs")
-const numbers = fs.readFileSync("day_01_1.txt", "utf-8")
+const numbers = fs.readFileSync("day_01.txt", "utf-8")
     .split("\n")
     .filter(s => s.length)
     .map(s => parseInt(s))
