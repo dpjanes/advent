@@ -1,4 +1,4 @@
-// http://adventofcode.com/2020/day/4
+// http://adventofcode.com/2020/day/6
 const fs = require("fs")
 const _ = require("lodash")
 
@@ -10,11 +10,8 @@ const parse = text => text
     )
 
 const answers = parse(fs.readFileSync("day_06.txt", "utf-8"))
-// console.log(answers)
 const count = answers
     .map(a => a.length)
     .reduce((r, c) => r + c, 0)
 
 console.log(count)
-/*
-*/
