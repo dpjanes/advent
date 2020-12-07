@@ -8,7 +8,7 @@ const parse = text => text
     .map(line => line.match(/^(?<type>[a-z ]*) bags contain (?<rest>.*)/))
     .map(lmatch => {
         const rule = {
-            type: lmatch.groups.type,
+            color: lmatch.groups.type,
             contains: {}
         }
 
@@ -23,5 +23,33 @@ const parse = text => text
         return rule
     })
 
-const rules = parse(fs.readFileSync("day_07.sample", "utf-8"))
-console.log(rules)
+
+const rules = parse(fs.readFileSync("day_07.txt", "utf-8"))
+const ruled = {}
+rules.forEach(rule => ruled[rule.color] = new Set(_.keys(rule.contains)))
+
+const contains_color = (color, target) => {
+    const contains = ruled[color]
+    if (contains.has(target)) {
+        return true
+    }
+
+    for (let subcolor of contains) {
+        if (contains_color(subcolor, target)) {
+            return true
+        }
+    }
+
+    return false
+}
+
+const colors = Array.from(new Set(rules.map(rule => rule.color)))
+count = 0
+colors.forEach(color => {
+    if (contains_color(color, "shiny gold")) {
+        count += 1
+        console.log(color)
+    }
+})
+
+console.log(count)
