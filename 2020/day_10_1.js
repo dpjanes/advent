@@ -34,7 +34,8 @@ const run = _adapters => {
     _search(0)
 
     console.log(deltas)
+    console.log(deltas[1] * deltas[3])
 }
 
-const adapters = parse(fs.readFileSync("day_10b.sample", "utf-8"))
+const adapters = parse(fs.readFileSync("day_10.txt", "utf-8"))
 run(adapters)
