@@ -20,8 +20,6 @@ const run = _adapters => {
     const _search = v => {
         used.add(v)
 
-        console.log(v)
-
         for (let d = 1; d <= 3; d++) {
             const vd = v + d
             if (adapters.has(vd) && !used.has(vd)) {
