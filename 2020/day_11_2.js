@@ -58,27 +58,46 @@ const iterate = (ogrid, MAX) => {
             for (let j = 0; j < height; j++) {
                 const counts = [ 0, 0, 0, 0 ]
 
-                /*
-                let debug = false
-                if (j === 9 && i === 2) {
-                    debug = true
-                }
-                */
+                const directions = [
+                    [ -1, -1 ],
+                    [ 0, -1 ],
+                    [ 1, -1 ],
 
-                for (let y = -1; y <= 1; y++) {
-                    for (let x = -1; x <= 1; x++) {
-                        if ((x === 0) && (y === 0)) {
-                            continue
+                    [ -1, 0 ],
+                    [ 1, 0 ],
+
+                    [ -1, 1 ],
+                    [ 0, 1 ],
+                    [ 1, 1 ],
+                ]
+
+                for (let di = 0; di < directions.length; di++) {
+                    const d = directions[di]
+
+                    let x = i
+                    let y = j
+
+                    while (true) {
+                        x += d[0]
+                        y += d[1]
+
+                        // console.log("-", di, x, y)
+
+                        const c = get(ogrid, x, y)
+                        if (c === FLOOR) {
+                            // keep looking
+                        } else if (c === OOB) {
+                            break
+                        } else {
+                            counts[c] += 1
+                            break
                         }
-
-                        // if (debug) console.log("DEBUG", i, j, x + i, y + j, get(ogrid, x + i, y + j))
-
-                        counts[get(ogrid, x + i, y + j)] += 1
                     }
                 }
 
-                set(ngrid, i, j, get(ogrid, i, j))
+                // console.log(i, j, counts)
 
+                set(ngrid, i, j, get(ogrid, i, j))
 
                 switch (get(ogrid, i, j)) {
                 case EMPTY:
@@ -88,7 +107,7 @@ const iterate = (ogrid, MAX) => {
                     break
 
                 case OCCUPIED:
-                    if (counts[OCCUPIED] >= 4) {
+                    if (counts[OCCUPIED] >= 5) {
                         set(ngrid, i, j, EMPTY)
                     }
                     break
@@ -108,8 +127,8 @@ const iterate = (ogrid, MAX) => {
             }
         }
 
-        // console.log("---", changes)
-        // console.log(pretty(ngrid))
+        //console.log("---", changes)
+        //console.log(pretty(ngrid))
 
         if (changes === 0) {
             console.log(counts[OCCUPIED])
@@ -124,4 +143,4 @@ const iterate = (ogrid, MAX) => {
 
 const grid = parse(fs.readFileSync("day_11.txt", "utf-8"))
 // console.log(pretty(grid))
-iterate(grid, 100000000)
+iterate(grid, 200000)
