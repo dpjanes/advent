@@ -102,17 +102,17 @@ const parse = text => {
         const results = []
         tuples.forEach(tuple => {
             const tag = tuple[0]
-            const values = tuple[1]
-            console.log(tag, values)
+            const possibles = tuple[1]
+            console.log(tag, possibles)
 
-            for (let vi = 0; vi < values.length; vi++) {
-                const value = values[vi]
+            for (let pi = 0; pi < possibles.length; pi++) {
+                const possible = possibles[pi]
 
-                if (results.indexOf(value) === -1) {
-                    results.push(value)
+                if (results.indexOf(possible) === -1) {
+                    results.push(possible)
 
                     if (tag.startsWith("departure")) {
-                        result *= self.tickets[0][value]
+                        result *= self.tickets[0][possible]
                     }
 
                     break
