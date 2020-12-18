@@ -147,6 +147,7 @@ const run = (raw, iterations) => {
         }
         */
 
+    console.log("COUNT", grid.count())
         grid = grid.iterate()
         // grid.pretty()
 
