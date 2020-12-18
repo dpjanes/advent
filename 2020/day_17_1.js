@@ -5,9 +5,6 @@ const fs = require("fs")
 const _ = require("lodash")
 const assert = require("assert")
 
-const INACTIVE = "."
-const ACTIVE = "#"
-
 const Grid = () => {
     const self = Object.assign({})
 
