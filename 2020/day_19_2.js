@@ -3,7 +3,7 @@ const fs = require("fs")
 const assert = require("assert")
 const _ = require("lodash")
 
-const data = fs.readFileSync("day_19.b", "utf-8")
+const data = fs.readFileSync("day_19.txt", "utf-8")
 const parts = data.split("\n\n")
 assert.strictEqual(parts.length, 2)
 
@@ -50,20 +50,63 @@ const crunch = index => {
     
 }
 
-// console.log(rulesd)
-const crunched = crunch("0")
-// console.log(JSON.stringify(crunched, null, 2))
-const pattern = new RegExp("^" + crunch("0") + "$")
-// console.log(pattern)
+delete rulesd["8"]
+delete rulesd["11"]
+
+// 0: 8 11
+// 8: 42 | 42 8
+// 11: 42 31 | 42 11 31
+
+const crunched42 = crunch("42")
+const crunched42_rex = new RegExp("^" + crunched42)
+
+const crunched31 = crunch("31")
+const crunched31_rex = new RegExp("^" + crunched31)
+
+const crunch0 = new RegExp("^(" + crunched42 + "){2,}(" + crunched31 + ")+$")
+
+const match = text => {
+    let n42 = 0
+    let n31 = 0
+
+    while (true) {
+        const match = text.match(crunched42_rex)
+        if (match) {
+            text = text.substring(match[0].length)
+            n42 ++
+        } else {
+            break
+        }
+    }
+
+    while (true) {
+        const match = text.match(crunched31_rex)
+        if (match) {
+            text = text.substring(match[0].length)
+            n31++
+        } else {
+            break
+        }
+    }
+
+    console.log(n42, n31)
+
+    if ((n42 > 1) && n31 && n42 > n31 && text.length === 0) {
+        return true
+    } else {
+        return false
+    }
+}
 
 let count = 0
-const texts = parts[1].split("\n")
+const texts = parts[1].split("\n").filter(x => x.length)
 texts.forEach(text => {
-    result = text.match(pattern) ? true : false
+    console.log()
+    result = match(text) ? true : false
     if (result) {
         count += 1
     }
 
-    console.log(text, result)
+    console.log(text, result, !!text.match(crunch0))
 })
 console.log("matches", count)
