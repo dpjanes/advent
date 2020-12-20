@@ -20,6 +20,7 @@ const Grid = (raw) => {
     
     const _key = (x, y) => `${x}/${y}`
 
+    self.N = () => maxx - minx + 1
     self.posx = null
     self.posy = null
     self.tile = null
@@ -142,7 +143,9 @@ const Grid = (raw) => {
         }
     }
 
-    self.initialize(raw)
+    if (raw) {
+        self.initialize(raw)
+    }
 
     return self
 }
@@ -154,7 +157,7 @@ const _flip = s => {
 }
 
 const run = (raw, iterations) => {
-    const grids = raw.split("\n\n").map(block => Grid(block))
+    let grids = raw.split("\n\n").map(block => Grid(block))
     const gridd = {}
     grids.forEach(grid => gridd[grid.tile] = grid)
 
@@ -202,8 +205,10 @@ const run = (raw, iterations) => {
 
     // order the tiles
     const dones = new Set()
+    const seens = {}
 
     const _iterate = tile => {
+        console.log("+", tile)
         if (dones.has(tile)) {
             return
         } else {
@@ -211,10 +216,12 @@ const run = (raw, iterations) => {
         }
 
         const grid = gridd[tile]
-        if (!dones.size) {
-            grid.posx = 0
-            grid.posy = 0
+
+        const key = `${grid.posx}/${grid.posy}`
+        if (seens[key]) {
+            console.log("WHAT", key, seens[key], tile)
         }
+        seens[`${grid.posx}/${grid.posy}`] = tile
 
         const borders = grid.borders() // TOP BOTTOM LEFT RIGHT
         const ntiles = neighbours[tile]
@@ -229,34 +236,48 @@ const run = (raw, iterations) => {
                     const nborders = ngrid.borders()
                     if (borders[TOP] === nborders[BOTTOM]) {
                         placed = true
-                        ngrid.posx = ngrid.posx
-                        ngrid.posy = ngrid.posy - 1
-                        gridd[ntile] = ngrid
+                        ngrid.posx = grid.posx
+                        ngrid.posy = grid.posy - 1
                         // console.log("PLACED")
                     } else if (borders[BOTTOM] === nborders[TOP]) {
                         placed = true
-                        ngrid.posx = ngrid.posx
-                        ngrid.posy = ngrid.posy + 1
-                        gridd[ntile] = ngrid
+                        ngrid.posx = grid.posx
+                        ngrid.posy = grid.posy + 1
                         // console.log("PLACED")
                     } else if (borders[LEFT] === nborders[RIGHT]) {
                         placed = true
-                        ngrid.posx = ngrid.posx - 1
-                        ngrid.posy = ngrid.posy
-                        gridd[ntile] = ngrid
+                        ngrid.posx = grid.posx - 1
+                        ngrid.posy = grid.posy
                         // console.log("PLACED")
                     } else if (borders[RIGHT] === nborders[LEFT]) {
                         placed = true
-                        ngrid.posx = ngrid.posx + 1
-                        ngrid.posy = ngrid.posy
-                        gridd[ntile] = ngrid
+                        ngrid.posx = grid.posx + 1
+                        ngrid.posy = grid.posy
                         // console.log("PLACED")
                     } else {
                         // console.log("NOT PLACED")
                         // console.log(borders, nborders)
                     }
 
+                    /*
+                    if (placed) {
+                        const key = `${ngrid.posx}/${ngrid.posy}`
+                        if (seens[key]) {
+                            console.log("REPEAT???", key)
+                            // placed = false
+                        }
+                    }
+                    */
+                    if (placed) {
+                        gridd[ntile] = ngrid
+                        break
+                    }
+
                     ngrid.rotate()
+                }
+
+                if (placed) {
+                    break
                 }
 
                 ngrid.transpose()
@@ -270,13 +291,53 @@ const run = (raw, iterations) => {
 
     _iterate(corners[0])
 
-    console.log(_.values(gridd).map(grid => ({
+    grids = _.values(gridd)
+
+    if (1) console.log(_.values(gridd).map(grid => ({
         tile: grid.tile,
         posx: grid.posx,
         posy: grid.posy,
         
     })))
-        
+
+    // sanity check
+    {
+        const seens = new Set()
+        grids.forEach(grid => {
+            const key = `${grid.posx}/${grid.posy}`
+            console.log(key)
+            assert.ok(!seens.has(key))
+            seens.add(key)
+        })
+    }
+
+    // make the master grid
+    let minposx = Math.min(...grids.map(grid => grid.posx))
+    let minposy = Math.min(...grids.map(grid => grid.posy))
+    grids.forEach(grid => {
+        grid.posx -= minposx
+        grid.posy -= minposy
+    })
+
+    let maxposx = Math.max(...grids.map(grid => grid.posx))
+    let maxposy = Math.max(...grids.map(grid => grid.posy))
+
+    const master = Grid()
+    const N = grids[0].N()
+    const N2 = N - 2
+
+    grids.forEach(grid => {
+        for (let x = 0; x < N - 2; x++) {
+            for (let y = 0; y < N - 2; y++) {
+                master.set(
+                    grid.posx * N2 + x,
+                    grid.posy * N2 + y,
+                    grid.get(x + 1, y + 1))
+            }
+        }
+    })
+
+    master.pretty()
 
     // console.log(dones)
 }
