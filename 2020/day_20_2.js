@@ -143,6 +143,19 @@ const Grid = (raw) => {
         }
     }
 
+    self.prettys = () => {
+        const cs = []
+
+        for (let y = miny; y <= maxy; y++) {
+            for (let x = minx; x <= maxx; x++) {
+                cs.push(self.get(x, y) ? "#" : ".")
+            }
+            cs.push("\n")
+        }
+
+        return cs.join("")
+    }
+
     if (raw) {
         self.initialize(raw)
     }
@@ -208,7 +221,7 @@ const run = (raw, iterations) => {
     const seens = {}
 
     const _iterate = tile => {
-        console.log("+", tile)
+        // console.log("+", tile)
         if (dones.has(tile)) {
             return
         } else {
@@ -226,7 +239,7 @@ const run = (raw, iterations) => {
         const borders = grid.borders() // TOP BOTTOM LEFT RIGHT
         const ntiles = neighbours[tile]
         for (let ntile of ntiles) {
-            console.log("-", tile, ntile)
+            // console.log("-", tile, ntile)
 
             let placed = false
             let ngrid = gridd[ntile]
@@ -293,7 +306,7 @@ const run = (raw, iterations) => {
 
     grids = _.values(gridd)
 
-    if (1) console.log(_.values(gridd).map(grid => ({
+    if (0) console.log(_.values(gridd).map(grid => ({
         tile: grid.tile,
         posx: grid.posx,
         posy: grid.posy,
@@ -305,7 +318,7 @@ const run = (raw, iterations) => {
         const seens = new Set()
         grids.forEach(grid => {
             const key = `${grid.posx}/${grid.posy}`
-            console.log(key)
+            // console.log(key)
             assert.ok(!seens.has(key))
             seens.add(key)
         })
@@ -337,9 +350,48 @@ const run = (raw, iterations) => {
         }
     })
 
-    master.pretty()
+    const monster = [
+        new RegExp("^..................#"),
+        new RegExp("^#....##....##....###"),
+        new RegExp("^.#..#..#..#..#..#"),
+    ]
 
-    // console.log(dones)
+    console.log("=======")
+
+    let matches = 0
+    for (let outer = 0; outer < 2 && !matches; outer++) {
+        for (let inner = 0; inner < 4 && !matches; inner++) {
+            console.log("*", outer, inner)
+
+            const lines = master.prettys().split("\n")
+            for (let li = 0; li < lines.length - 2; li++) {
+                for (let xi = 0; xi < lines[li].length; xi++) {
+                    let is_match = true
+
+                    for (let mi = 0; mi < monster.length; mi++) {
+                        const text = lines[li + mi].substring(xi)
+                        const match = text.match(monster[mi])
+                        if (!match) {
+                            is_match = false
+                            break
+                        }
+                    }
+
+                    if (is_match) {
+                        console.log("MATCH", li, xi)
+                        matches++
+                    }
+                }
+            }
+            master.rotate()
+        }
+        master.transpose()
+    }
+
+
+    const hashes = master.prettys().replace(/[^#]/g, "").length
+    console.log(hashes - 15 * matches)
+
 }
 
-run(fs.readFileSync("day_20.sample", "utf-8"), 6)
+run(fs.readFileSync("day_20.txt", "utf-8"), 6)
