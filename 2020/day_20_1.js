@@ -157,11 +157,6 @@ const run = (raw, iterations) => {
     assert.strictEqual(corners.length, 4)
 
     console.log(corners[0] * corners[1] * corners[2] * corners[3])
-    /*
-    console.log(parts)
-    let grid = Grid()
-    grid.initialize(raw)
-    */
 }
 
-run(fs.readFileSync("day_20.sample", "utf-8"), 6)
+run(fs.readFileSync("day_20.txt", "utf-8"), 6)
