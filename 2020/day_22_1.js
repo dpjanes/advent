@@ -1,4 +1,4 @@
-// http://adventofcode.com/2020/day/3
+// http://adventofcode.com/2020/day/22
 const fs = require("fs")
 const assert = require("assert")
 const _ = require("lodash")
