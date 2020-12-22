@@ -23,97 +23,73 @@ const parse = raw => {
     return cards
 }
 
-const play = () => {
-    let ngame = 0
+let ngame = 0
 
-    const game = cards => {
-        let nround = 0
-        const seens = [ null, new Set(), new Set() ]
+const game = (cards1, cards2, depth) => {
+    let nround = 0
+    const seen = new Set()
 
-        console.log(`== Game ${++ngame} ==`)
+    console.log(`== Game ${++ngame} ==`)
+    // console.log("cards1", cards1)
+    // console.log("cards2", cards2)
 
-
-        const round = () => {
-            const deck1 = cards[1].join(", ")
-            const deck2 = cards[2].join(", ")
-
-            if (seens[1].has(deck1)) {
-                console.log("RECURSION WINNER (deck1 repeat)")
-                return -1
-            } else if (seens[2].has(deck2)) {
-                console.log("RECURSION WINNER (deck2 repeat)")
-                return -1
-            }
-
-            seens[1].add(deck1)
-            seens[2].add(deck2)
-
-            // console.log(`-- Round ${++nround} --`)
-            // console.log(`Player 1's deck: ${deck1}`)
-            // console.log(`Player 2's deck: ${deck2}`)
-
-            const card1 = cards[1].shift()
-            const card2 = cards[2].shift()
-
-            // console.log(`Player 1 plays: ${card1}`)
-            // console.log(`Player 2 plays: ${card2}`)
-
-            // If both players have at least as many cards remaining in their deck as the value of the card they just drew, the winner of the round is determined by playing a new game of Recursive Combat (see below).
-            // Otherwise, at least one player must not have enough cards left in their deck to recurse; the winner of the round is the player with the higher-value card.
-            let winner = 0
-            if ((card1 <= cards[1].length) && (card2 <= cards[2].length)) {
-                // console.log("playing subgame")
-                winner = game([
-                    null,
-                    cards[1].slice(),
-                    cards[2].slice(),
-                ])
-            } else if (card1 > card2) {
-                // console.log(`Player 1 wins the round!`)
-                winner = 1
-            } else {
-                // console.log(`Player 2 wins the round!`)
-                winner = 2
-            }
-
-            if (winner < 0) {
-                return winner
-            } else if (winner == 1) {
-                cards[1].push(card1)
-                cards[1].push(card2)
-                return 1
-            } else {
-                cards[2].push(card2)
-                cards[2].push(card1)
-                return 2
-            }
+    let winner
+    while (cards1.length && cards2.length) {
+        const KEY = cards1.join(",") + "@" + cards2.join(",")
+        if (seen.has(KEY)) {
+            console.log("RECURSION WINNER (deck1 repeat)")
+            return 1
+        } else {
+            seen.add(KEY)
         }
 
-        let winner
-        while (cards[1].length && cards[2].length) {
-            winner = round()
-            if (winner < 0) {
-                return -winner
-            }
+        // console.log(`-- Round ${++nround} --`)
+        // console.log(`Player 1's deck: ${cards1.join(", ")}`)
+        // console.log(`Player 2's deck: ${cards2.join(", ")}`)
+
+        const card1 = cards1.shift()
+        const card2 = cards2.shift()
+        // console.log(`Player 1 plays: ${card1}`)
+        // console.log(`Player 2 plays: ${card2}`)
+
+        if ((card1 <= cards1.length) && (card2 <= cards2.length)) {
+            // console.log("playing subgame")
+            winner = game(
+                cards1.slice(0, card1),
+                cards2.slice(0, card2),
+                depth + 1
+            )
+            // console.log("SUBWINNER", winner)
+        } else if (card1 > card2) {
+            // console.log(`Player 1 wins the round!`)
+            winner = 1
+        } else {
+            // console.log(`Player 2 wins the round!`)
+            winner = 2
         }
 
-        let total = 0
-        cards[winner].forEach((card, cardx, cs) => {
-            total += card * (cs.length - cardx)
-        })
-        console.log(total)
-
-        return winner
+        if (winner == 1) {
+            cards1.push(card1)
+            cards1.push(card2)
+        } else {
+            cards2.push(card2)
+            cards2.push(card1)
+        }
     }
 
-    const winner = game([
-        null,
-        cards[1].slice(),
-        cards[2].slice(),
-    ])
+    if (depth === 0) {
+        let cs = winner === 1 ? cards1 : cards2
+        let total = 0
+        cs.forEach((card, cardx, cs) => {
+            total += card * (cs.length - cardx)
+        })
+        console.log("WINNER", winner)
+        console.log("TOTAL", total)
+    }
 
-    console.log(winner)
+    return winner
 }
+
 
 const raw = fs.readFileSync("day_22.txt", "utf-8")
 const xraw = `Player 1:
@@ -125,4 +101,4 @@ Player 2:
 29
 14`
 const cards = parse(raw)
-play()
+game(cards[1].slice(), cards[2].slice(), 0)
