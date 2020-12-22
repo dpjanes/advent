@@ -13,7 +13,7 @@ const parse = text => text
         ]
     })
 
-const lines = parse(fs.readFileSync("day_21.sample", "utf-8"))
+const lines = parse(fs.readFileSync("day_21.txt", "utf-8"))
 const possibles = {}
 const gudfud = new Set()
 
@@ -57,15 +57,6 @@ while (changes) {
     })
 }
 
-count = 0
-lines.forEach(t => {
-    const foods = t[0]
-    foods.forEach(food => {
-        if (gudfud.has(food)) {
-            count += 1
-        }
-    })
-})
-
-console.log(allergind)
-console.log(count)
+const items = _.toPairs(allergind)
+items.sort()
+console.log(items.map(item => item[1]).join(","))
