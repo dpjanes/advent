@@ -39,9 +39,14 @@ const Circle = () => {
             .forEach(i => self.push(i))
 
         currentv = state[0].value
+
+        for (let i = maxv + 1; i <= 1000 * 1000; i++) {
+            self.push(i)
+        }
     }
 
     self.flat = () => {
+        return []
         const parts = []
 
         let cursor = valued[1]
@@ -54,6 +59,7 @@ const Circle = () => {
     }
 
     self.prettys = () => {
+        return []
         const parts = []
 
         let cursor = valued[currentv]
@@ -79,18 +85,20 @@ const Circle = () => {
     self.play = MOVES => {
         let nmove = 0
         const move = () => {
-            console.log(`-- move ${++nmove} --`)
-            console.log(`cups: ${self.prettys()}`)
+            ++nmove
+            if (nmove % 10000 === 0) {
+                console.log(`-- move ${nmove} --`)
+            }
+            // console.log(`cups: ${self.prettys()}`)
 
             const currentd = valued[currentv]
-            console.log("CURRENT", currentd)
+            // console.log("CURRENT", currentd)
             let popd = currentd
             const popds = []
             for (let i = 0; i < 3; i++) {
                 popd = state[popd.next]
-                popd.X = true
                 popds.push(popd)
-                console.log("POP", popd)
+                // console.log("POP", popd)
             }
 
             let nextv = currentv
@@ -128,13 +136,18 @@ const Circle = () => {
             move()
         }
 
-        console.log("FINAL", self.flat())
+        let d1 = valued[1]
+        let d2 = state[d1.next]
+        let d3 = state[d2.next]
+
+        console.log("FINAL", d1, d2, d3)
+        console.log("RESULT", d2.value * d3.value)
     }
 
     return self
 }
 
 const circle = Circle()
-circle.initialize("389125467") // test
-// circle.initialize("562893147") // real
-circle.play(10)
+// circle.initialize("389125467") // test
+circle.initialize("562893147") // real
+circle.play(1000 * 1000 * 10)
