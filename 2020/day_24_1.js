@@ -10,11 +10,11 @@ const same = (a, b) => (a.x === b.x) && (a.y === b.y);
 const move = (position, direction) => {
     const move = {
         'w':  [-2,  0],
-        'e':  [ 2,  0],
+        'e':  [+2,  0],
         'sw': [-1, -1],
-        'nw': [-1,  1],
-        'se': [ 1, -1],
-        'ne': [ 1,  1],
+        'nw': [-1, +1],
+        'se': [+1, -1],
+        'ne': [+1, +1],
     }[direction]
 
     return make(position.x + move[0], position.y + move[1])
