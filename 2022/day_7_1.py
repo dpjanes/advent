@@ -2,12 +2,13 @@ import os
 import pprint
 
 def main(filename, part):
-    in_ls = False
-    cwd = "/"
     fsd = {}
     sized = {}
 
     with open(filename) as fin:
+        in_ls = False
+        cwd = "/"
+        
         for line in fin.read().splitlines():
             match line.split(" "):
                 case [ "$", "cd", *parts ]:
