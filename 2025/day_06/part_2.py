@@ -11,15 +11,20 @@ def is_number(s: str) -> bool:
         return False
 
 def xform(inputs: list[str]) -> list[int]:
+    # print("------")
+    # print(inputs)
     results = []
     for x in range(len(inputs[0])):
         result = ""
         for row in inputs:
             result += row[x]
 
-        results.append(int(result.strip()))
+        result = result.strip()
+        if not result:
+            continue
 
-    # print("------")
+        results.append(int(result))
+
     # print(results)
     # return [0]
     return results
@@ -32,40 +37,30 @@ def main(filename: str):
             line = line.strip("\n")
 
     positions = [i for i, ch in enumerate(line) if ch in [ "*", "+" ]]
-
-
-    print(positions)
-    return
+    positions.append(len(line)+1)
 
     sum = 0
-    gap = None
     with open(filename, 'r') as fin:
         for line in fin:
             line = line.strip("\n")
             if not line:
                 continue
 
-            if gap is None:
-                state = 0
-                for cx, c in enumerate(line):
-                    if state == 0:
-                        if c == " ":
-                            state = 1
-                    elif state == 1:
-                        if c != " ":
-                            gap = cx
-                            break
+            parts = []
+            for posx in range(len(positions)-1):
+                start = positions[posx]
+                end = positions[posx+1]
+                parts.append(line[start:end])
 
-            line += " " * (gap - (len(line) % gap))
-            print(line)
-            parts = [line[i:i+gap] for i in range(0, len(line), gap)]
+            # print(parts)
+            # return
 
             if not ACCUM:
                 ACCUM = [[] for _ in parts]
 
             if "*" not in line:
                 for px, part in enumerate(parts):
-                    ACCUM[px].append(part[:-1])
+                    ACCUM[px].append(part)
             else:
                 for px, op in enumerate(parts):
                     op = op.strip()
