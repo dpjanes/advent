@@ -1,11 +1,5 @@
-import re 
 import sys
 import dataclasses
-
-'''
-[.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}
-[...#.] (0,2,3,4) (2,3) (0,4) (0,1,2) (1,2,3,4) {7,5,12,7,2}
-[.###.#] (0,1,2,3,4) (0,3,4) (0,1,2,4,5) (1,2) {10,11,11,5,10,5}'''
 
 @dataclasses.dataclass
 class Row:
@@ -34,28 +28,6 @@ class Row:
                 row.joltages = [int(x) for x in part.split(',')]
 
         return row
-    
-def solve_depth_first(row: Row, state: set[int], wiring: list[int], steps: list[list[int]]) -> list[list[int]]:
-    # print("X", wiring)
-    state = set(state)
-    for wx in wiring or []:
-        if wx in state:
-            state.remove(wx)
-        else:
-            state.add(wx)
-
-    if state == row.lights:
-        # print("Found solution:", wiring)
-        return steps
-    
-    if len(steps) > 5:
-        # print("Max depth reached")
-        return
-
-    for wiring in row.wirings:
-        solution = solve_depth_first(row, state, wiring, steps + [ wiring ])
-        if solution:
-            return solution
         
 def solve_breadth_first(row: Row) -> list[list[int]]:
     stack = [
@@ -82,8 +54,6 @@ def solve_breadth_first(row: Row) -> list[list[int]]:
 
         for wiring in row.wirings:
             stack.append( ( state, wiring, steps + [ wiring ] ) )
-    pass
-
 
 def main(filename: str):
     rows: list[Row] = []
@@ -102,12 +72,6 @@ def main(filename: str):
         print("Solution:", solution)
 
     print("Total count:", count)
-
-
-
-            # print(line.strip())
-            # print(row)
-            # print()
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
