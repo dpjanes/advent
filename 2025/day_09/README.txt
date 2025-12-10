@@ -139,3 +139,29 @@ The largest rectangle you can make in this example using only red and green tile
 .........#X#..
 ..............
 Using two red tiles as opposite corners, what is the largest area of any rectangle you can make using only red and green tiles?
+
+
+---
+
+    return
+    max_col = max(col for col, row in DB)
+    max_row = max(row for col, row in DB)
+    N = ( max_row + 1 ) * ( max_col + 1 )
+    print(N)
+    print(len(DB))
+    GRID: set[tuple[int, int]] = set()
+    for a in DB:
+        for b in DB:
+            if a == b:
+                continue
+
+        min_row = min(a[1], b[1])
+        max_row = max(a[1], b[1])
+        min_col = min(a[0], b[0])
+        max_col = max(a[0], b[0])
+
+        for row in range(min_row, max_row + 1):
+            for col in range(min_col, max_col + 1):
+                GRID.add((col, row))
+
+    return
