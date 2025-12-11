@@ -1,5 +1,7 @@
 import sys
 import dataclasses
+import itertools
+import sympy as sp
 
 @dataclasses.dataclass
 class Row:
@@ -30,30 +32,134 @@ class Row:
         return row
         
 def solve_breadth_first(row: Row) -> list[list[int]]:
+    # wiring_plan = list(row.wirings)
+    # wiring_plan.sort(key=lambda w: -sum(w))
+
+    BEST_SOLUTION = None
     stack = [
-        ( set(), [], [] )
+        ( [ 0 ] * len(row.joltages), [], [] )
     ]
-    stack_index = 0
-    while stack_index < len(stack):
-        state, wiring, steps = stack[stack_index]
-        stack_index += 1
+    seen = set()
+    while stack:
+        joltages, wiring, steps = stack.pop()
+        if tuple(joltages) in seen:
+            print("Already seen:", joltages)
+            continue
 
-        state = set(state)
+        if BEST_SOLUTION and len(steps) > len(BEST_SOLUTION):
+            continue
+
+        joltages = list(joltages)
+        stop = False
         for wx in wiring:
-            if wx in state:
-                state.remove(wx)
-            else:
-                state.add(wx)
+            joltages[wx] += 1
+            if joltages[wx] > row.joltages[wx]:
+                stop = True
+                break
 
-        if state == row.lights:
-            return steps
+        if stop:
+            continue
+
+        # print(joltages, row.joltages, len(steps))
+        if joltages == row.joltages:
+            if not BEST_SOLUTION or len(steps) < len(BEST_SOLUTION):
+                BEST_SOLUTION = list(steps)
+                print("New best solution:", BEST_SOLUTION)
+
+        seen.add( tuple(joltages) )
+
+        # print(len(steps), len(BEST_SOLUTION) if BEST_SOLUTION else "N/A")
         
-        if len(steps) > 10:
-            print("Max depth reached")
+        if len(steps) > 40:
+            # print("Max depth reached")
             continue
 
         for wiring in row.wirings:
-            stack.append( ( state, wiring, steps + [ wiring ] ) )
+            stack.append( ( joltages, wiring, steps + [ wiring ] ) )
+
+    return BEST_SOLUTION
+
+def osc():
+    yield 0
+
+    index = 1
+    while index < 40:
+        yield index
+        yield -index
+
+        index += 1
+
+
+def solve_with_zero_free_params(wirings: list[list[int]], joltages: list[int]) -> list[int]:
+    A = sp.Matrix(list(zip(*wirings)))
+    b = sp.Matrix(joltages)
+
+    sol, params = A.gauss_jordan_solve(b)
+    if not params:
+        return list(map(int, sol))
+
+    for t in itertools.product(osc(), repeat=len(params)):
+        subs_map = {p: v for p, v in zip(params, t)}   # params is a tuple of tau0, tau1, ...
+        nsol = sol.subs(subs_map)
+
+        result = list(map(int, nsol))
+
+        ok = True
+        for r in result:
+            if r < 0:
+                ok = False
+                break
+
+        if ok:
+            return result
+
+    print("NO SOLUTIONS")        
+    return []
+
+    # Substitute all free parameters with 0
+    for x in range(0, 75):
+        for y in range(0, 75):
+            print("PARAMS", len(params), params)
+            subs_map = {p: x for p in params}   # params is a tuple of tau0, tau1, ...
+            if len(subs_map) > 1:
+                subs_map[params[1]] = y
+            nsol = sol.subs(subs_map)
+
+            result = list(map(int, nsol))
+
+            ok = True
+            for r in result:
+                if r < 0:
+                    ok = False
+
+            if ok:
+                return result
+
+            print("RETRY:", x, result, params, subs_map)
+
+
+    print("NO SOLUTIONS")
+    # raise RuntimeError("No solution found with non-negative integers")
+
+
+    return result
+
+def solve_new(row: Row) -> list[list[int]]:
+    print()
+    print("joltages:", row.joltages)
+    print('wirings:')
+    vss = []
+    for wiring in row.wirings:
+        vs = [ 0 ] * len(row.joltages)
+        for wx in wiring:
+            vs[wx] = 1
+
+        vss.append(vs)
+        print(" ", vs)
+
+    result = solve_with_zero_free_params(vss, row.joltages)
+    print("Result:", result, sum(result))
+    return sum(result)
 
 def main(filename: str):
     rows: list[Row] = []
@@ -67,9 +173,10 @@ def main(filename: str):
 
     count = 0
     for row in rows:
-        solution = solve_breadth_first(row)
-        count += len(solution) if solution else 0
-        print("Solution:", solution)
+        solution = solve_new(row)
+        count += solution or 0
+        ## print("Solution:", solution, len(solution) if solution else "No solution")
+        ## break
 
     print("Total count:", count)
 
